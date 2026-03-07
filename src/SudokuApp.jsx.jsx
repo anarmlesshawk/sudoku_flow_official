@@ -1369,13 +1369,13 @@ function GameScreen({t,settings,difficulty:initDiff,savedState,seed:initSeed,onH
   const aBt=(active,color)=>({flex:1,padding:"10px 2px",borderRadius:10,background:active?`${color}18`:gt.bgCard,border:`1.5px solid ${active?color:gt.brd}`,color:active?color:gt.mut,fontSize:"clamp(9px,2.3vw,11px)",fontWeight:700,fontFamily:MONO,letterSpacing:"0.03em",textTransform:"uppercase"});
 
   return(
-    <div style={{height:"100dvh",width:"100vw",background:gt.bg,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"flex-start",paddingTop:"max(env(safe-area-inset-top),8px)",paddingBottom:"max(env(safe-area-inset-bottom),8px)",paddingLeft:8,paddingRight:8,boxSizing:"border-box",fontFamily:MONO,color:gt.pri,touchAction:"manipulation",overflow:"hidden",gap:8}}>
+    <div style={{position:"fixed",inset:0,background:gt.bg,display:"flex",flexDirection:"column",alignItems:"center",paddingTop:"max(env(safe-area-inset-top),10px)",paddingBottom:"max(env(safe-area-inset-bottom),14px)",paddingLeft:8,paddingRight:8,boxSizing:"border-box",fontFamily:MONO,color:gt.pri,touchAction:"manipulation",overflow:"hidden",gap:6}}>
       <style>{`@keyframes shk{0%{transform:translateX(0)}20%{transform:translateX(-3px)}40%{transform:translateX(3px)}60%{transform:translateX(-2px)}80%{transform:translateX(2px)}100%{transform:translateX(0)}} @keyframes plsL{0%,100%{opacity:1}50%{opacity:0.35}}`}</style>
 
       {/* AD SLOT — hidden until monetisation enabled */}
 
       {/* Top bar */}
-      <div style={{width:"100%",maxWidth:460,display:"flex",alignItems:"center",justifyContent:"space-between",flexShrink:0,marginBottom:4}}>
+      <div style={{width:"100%",maxWidth:460,display:"flex",alignItems:"center",justifyContent:"space-between",flexShrink:0}}>
         <Btn onTap={onHome} style={{background:gt.bgCard,border:`1.5px solid ${gt.brdM}`,borderRadius:8,color:gt.sec,fontFamily:MONO,fontSize:11,letterSpacing:"0.05em",padding:"6px 10px"}}>⌂ Home</Btn>
         <div style={{textAlign:"center"}}>
           {badge&&<div style={{fontSize:8,letterSpacing:"0.3em",color:`${acc}cc`,marginBottom:1,textTransform:"uppercase"}}>{badge}</div>}
@@ -1398,7 +1398,7 @@ function GameScreen({t,settings,difficulty:initDiff,savedState,seed:initSeed,onH
       </div>
 
       {/* Board — size is driven by available space, capped so it never overflows */}
-      <div style={{position:"relative",width:"min(94vw,calc(100dvh - 230px))",aspectRatio:"1/1",flexShrink:0}}>
+      <div style={{position:"relative",flexGrow:1,flexShrink:1,minHeight:0,aspectRatio:"1/1",width:"min(94vw,100%)",maxWidth:"calc(100vh - 200px)",alignSelf:"center"}}>
         {/* Col indicators */}
         <div style={{position:"absolute",top:-13,left:0,right:0,display:"grid",gridTemplateColumns:"repeat(9,1fr)"}}>
           {[0,1,2,3,4,5,6,7,8].map(c=><div key={c} style={{display:"flex",justifyContent:"center",alignItems:"center",height:11}}>{sc===c&&<div style={{width:12,height:3,borderRadius:2,background:acc,opacity:0.75}}/>}</div>)}
@@ -1408,7 +1408,14 @@ function GameScreen({t,settings,difficulty:initDiff,savedState,seed:initSeed,onH
           {[0,1,2,3,4,5,6,7,8].map(r=><div key={r} style={{display:"flex",justifyContent:"center",alignItems:"center",width:11}}>{sr===r&&<div style={{width:3,height:12,borderRadius:2,background:acc,opacity:0.75}}/>}</div>)}
         </div>
         {/* Grid */}
-        <div style={{display:"grid",gridTemplateColumns:"repeat(9,1fr)",width:"100%",height:"100%",borderRadius:8,overflow:"hidden",border:`2px solid ${gt.brdM}`,boxSizing:"border-box",...(settings.boardReward?getRewardStyle(settings.boardReward,acc):{boxShadow:`0 8px 32px rgba(0,0,0,0.18)`})}}>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(9,1fr)",width:"100%",height:"100%",borderRadius:8,overflow:"hidden",border:`2px solid ${gt.brdM}`,boxSizing:"border-box",position:"relative",...(settings.boardReward?getRewardStyle(settings.boardReward,acc):{boxShadow:`0 8px 32px rgba(0,0,0,0.18)`})}}>
+          {/* Box divider overlays — drawn on top so they don't affect cell sizing */}
+          {[1,2].map(i=>(
+            <div key={`vb${i}`} style={{position:"absolute",top:0,bottom:0,left:`${i*100/3}%`,width:2,background:gt.brdM,zIndex:2,transform:"translateX(-1px)",pointerEvents:"none"}}/>
+          ))}
+          {[1,2].map(i=>(
+            <div key={`hb${i}`} style={{position:"absolute",left:0,right:0,top:`${i*100/3}%`,height:2,background:gt.brdM,zIndex:2,transform:"translateY(-1px)",pointerEvents:"none"}}/>
+          ))}
           {board.map((row,r)=>row.map((val,c)=>{
             const ck=`${r}-${c}`;
             const isSel=sr===r&&sc===c;
@@ -1419,10 +1426,6 @@ function GameScreen({t,settings,difficulty:initDiff,savedState,seed:initSeed,onH
             const isGiv=given[r][c];
             const isOk=val!==0&&!isGiv&&!isFlsh&&val===sol[r][c];
             const cn=noteBoard[r][c];
-            // Box divider at cols 2,5 (right edge of 3rd/6th col, 0-indexed)
-            // Box divider at rows 2,5 (bottom edge of 3rd/6th row, 0-indexed)
-            const isBoxRight=c===2||c===5;
-            const isBoxBottom=r===2||r===5;
             const isLastCol=c===8;
             const isLastRow=r===8;
             const isHinted=smartH&&smartH.r===r&&smartH.c===c;
@@ -1440,10 +1443,10 @@ function GameScreen({t,settings,difficulty:initDiff,savedState,seed:initSeed,onH
                 onTouchEnd={e=>{e.preventDefault();if(won||over)return;if(settings.singleTapClear&&sel&&sr===r&&sc===c&&!isGiv&&val!==0){doNumber(0);return;}setSel([r,c]);}}
                 onClick={()=>{if(won||over)return;if(settings.singleTapClear&&sel&&sr===r&&sc===c&&!isGiv&&val!==0){doNumber(0);return;}setSel([r,c]);}}
                 style={{aspectRatio:"1",display:"flex",alignItems:"center",justifyContent:"center",background:bg,
-                  borderRight:isLastCol?"none":isBoxRight?`2.5px solid ${gt.brdM}`:`1.5px solid ${gt.brd}`,
-                  borderBottom:isLastRow?"none":isBoxBottom?`2.5px solid ${gt.brdM}`:`1.5px solid ${gt.brd}`,
+                  borderRight:isLastCol?"none":`1px solid ${gt.brd}`,
+                  borderBottom:isLastRow?"none":`1px solid ${gt.brd}`,
                   position:"relative",WebkitTapHighlightColor:"transparent",transition:"background .12s",
-                  animation:isPls?"plsL .65s ease":"none"}}>
+                  zIndex:1,animation:isPls?"plsL .65s ease":"none"}}>
                 {val!==0
                   ?<span style={{fontSize:numSz,fontWeight:isGiv?700:600,color:nc,fontFamily:SERIF,lineHeight:1,opacity:isFad?0:1,transition:"opacity .6s",animation:isFlsh&&!isFad?"shk .35s ease":"none",position:"relative"}}>
                       {val}
