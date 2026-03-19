@@ -2,8 +2,8 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
-export default defineConfig(
-  base: '/sudoku_flow_official/'
+export default defineConfig({
+  base: '/sudoku_flow_official/',
   plugins: [
     react(),
 
@@ -31,8 +31,8 @@ export default defineConfig(
         background_color: '#0f0f1a', // splash screen background colour
         display: 'standalone',       // hides browser chrome — feels like a native app
         orientation: 'portrait',
-        scope: '/',
-        start_url: '/',
+        scope: '/sudoku_flow_official/',
+        start_url: '/sudoku_flow_official/',
         icons: [
           {
             src: 'icons/icon-192.png',
