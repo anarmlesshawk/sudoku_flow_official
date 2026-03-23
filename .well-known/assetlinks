@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.anarmlesshawk.sudokuflow",
+      "sha256_cert_fingerprints": [
+        "3E:14:5F:99:0B:13:E3:85:1A:01:CB:E5:19:C9:9C:32:6F:50:F9:F6:E7:09:DF:96:D0:41:48:B6:87:2F:10:50"
+      ]
+    }
+  }
+]
